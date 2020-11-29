@@ -1,3 +1,6 @@
 node_modules
 public/*
 !public/.keep
+src/indexprinter.js
+src/indexgrbl.js
+src/indexprinter.ori.js

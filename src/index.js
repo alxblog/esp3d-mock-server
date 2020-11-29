@@ -6,9 +6,10 @@ const cors = require('cors')
 const fileUpload = require("express-fileupload")
 const throttle = require('express-throttle-bandwidth')
 const chalk = require('chalk')
+const Table = require('cli-table')
 
 /**
- * Routes
+ * Ext Routes
  */
 var filesRoute = require('./routes/files')
 
@@ -18,6 +19,7 @@ const throttleValue = 0//100000 // bps // if bps is <= 0 it does not throttle.
 const port = 8888
 const wsPort = 8830
 const fsDir = "public"
+const firmware = process.env.FIRMWARE || "marlin"
 let currentID = 0
 let sensorInterval = null
 let tempInterval = null
@@ -37,10 +39,16 @@ app.use(fileUpload({ preserveExtension: true, debug: false }))
 
 app.use((req, res, next) => {
     // console.log('Time: ', Date.now())
-    console.log(chalk`{black.bgWhite ${req.method}} ${req.originalUrl}`)
+    const table = new Table();
+    table.push(
+        ['Method', chalk`{black.bgWhite ${req.method}}`],
+        ['URL', req.originalUrl],
+        ['Query params', JSON.stringify(req.query)]
+        //req.params
+    );
+    console.log(table.toString())
     next()
 })
-
 
 /**
  * ROUTES
@@ -54,21 +62,13 @@ app.post("/login", function (req, res) {
     // return
 })
 
-app.get("/command", function (req, res) {
-    console.log(req)
-    // res.send(JSON.stringify(req.query, null, 4))
-    res.json(req.query)
-    // return
-})
-
 app.use('/files', filesRoute(fsDir))
 
-app.all("/updatefw", function (req, res) {
-    res.send("ok")
-})
+app.all("/updatefw", function (req, res) { res.send("ok") })
 
 app.listen(process.env.PORT || port, () => {
-    console.log(chalk`{white.bgBlack ESP}{black.bgWhite 3D} Mocking Server listening at http://localhost:${process.env.PORT || port}`)
+    console.log(chalk`{white.bgBlack ESP}{black.bgWhite 3D} Mocking Server listening at {cyan http://localhost:${process.env.PORT || port}}`)
+    console.log(chalk`Firmware : {cyan.bold ${firmware}}`)
 })
 
 wss.on("connection", ws => {

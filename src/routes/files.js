@@ -1,5 +1,6 @@
 const pathModule = require('path')
 const fs = require('fs')
+const rimraf = require("rimraf");
 const express = require('express')
 const router = express.Router()
 
@@ -48,25 +49,55 @@ function filesList(path) {
     }
 }
 
+const createDir = (path) => { if (!fs.existsSync(path)) fs.mkdirSync(path) }
+const deleteFile = (path) => {
+    try {
+        fs.unlinkSync(path)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+const deleteDir = (path) => {
+    rimraf(path, () => { });
+}
+
 const filesRoute = (fsdir) => {
 
     router.post('/', (req, res, next) => {
         const { path = '' } = req.query
         const { myFile = [] } = req.files
-        const targetPath = pathModule.resolve(process.cwd(), fsdir, path.replace(/^\/?/gm, ''))
+        const targetPath = pathModule.resolve(__dirname, '../../', fsdir, path.replace(/^\/?/gm, ''))
         const fileList = (!Array.isArray(myFile)) ? [myFile] : myFile
-        fileList.forEach(file => {
-            console.log(pathModule.join(targetPath, file.name))
-            file.mv(pathModule.join(targetPath, file.name), err => {
-                if (err) {
-                    res.status(500).send(err)
-                    next()
-                }
-                res.send(filesList(targetPath))
-            })
-        })
+        const mvPromiseList = fileList.map(file => file.mv(pathModule.join(targetPath, file.name)))
+        Promise.all(mvPromiseList).then((err) => {
+            res.send(filesList(targetPath))
+        }).catch(err => {
+            res.status(500).send(err)
+        });
     })
 
+    router.all('/', (req, res) => {
+        const { path, filename = '', action } = req.query
+        const targetPath = pathModule.resolve(__dirname, '../../', fsdir, path.replace(/^\/?/gm, ''))
+        const fullPath = pathModule.join(targetPath, filename)
+        switch (action) {
+            case 'deletedir':
+                deleteDir(fullPath)
+                break;
+            case 'delete':
+                deleteFile(fullPath) //do it real async
+                break;
+            case 'createdir':
+                createDir(fullPath)
+                break;
+
+            default:
+                break;
+        }
+        res.send(filesList(targetPath))
+
+    })
 
     return router
 }
