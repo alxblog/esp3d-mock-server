@@ -1,6 +1,6 @@
 const pathModule = require('path')
 const fs = require('fs')
-const rimraf = require("rimraf");
+const rimraf = require("rimraf")
 const express = require('express')
 const router = express.Router()
 
@@ -66,9 +66,9 @@ const filesRoute = (fsdir) => {
 
     router.post('/', (req, res, next) => {
         const { path = '' } = req.query
-        const { myFile = [] } = req.files
+        const { myfile = [] } = req.files
         const targetPath = pathModule.resolve(__dirname, '../../', fsdir, path.replace(/^\/?/gm, ''))
-        const fileList = (!Array.isArray(myFile)) ? [myFile] : myFile
+        const fileList = (!Array.isArray(myfile)) ? [{ ...myfile }] : myfile
         const mvPromiseList = fileList.map(file => file.mv(pathModule.join(targetPath, file.name)))
         Promise.all(mvPromiseList).then((err) => {
             res.send(filesList(targetPath))
