@@ -1,0 +1,135 @@
+{
+    "Status": [{
+            "id": "chip id",
+            "value": "38078"
+        },
+        {
+            "id": "CPU Freq",
+            "value": "240 Mhz"
+        },
+        {
+            "id": "CPU Temp",
+            "value": "50.6 C"
+        },
+        {
+            "id": "free mem",
+            "value": "217.50 KB"
+        },
+        {
+            "id": "SDK",
+            "value": "v3.3.1-61-g367c3c09c"
+        },
+        {
+            "id": "flash size",
+            "value": "4.00 MB"
+        },
+        {
+            "id": "size for update",
+            "value": "1.87 MB"
+        },
+        {
+            "id": "FS type",
+            "value": "SPIFFS"
+        },
+        {
+            "id": "FS usage",
+            "value": "39.95 KB/169.38 KB"
+        },
+        {
+            "id": "baud",
+            "value": "115200"
+        },
+        {
+            "id": "sleep mode",
+            "value": "none"
+        },
+        {
+            "id": "wifi",
+            "value": "ON"
+        },
+        {
+            "id": "hostname",
+            "value": "esp3d"
+        },
+        {
+            "id": "HTTP port",
+            "value": "80"
+        },
+        {
+            "id": "Telnet port",
+            "value": "23"
+        },
+        {
+            "id": "Ftp ports",
+            "value": "21, 20, 55600"
+        },
+        {
+            "id": "sta",
+            "value": "ON"
+        },
+        {
+            "id": "mac",
+            "value": "30:AE:A4:21:BE:94"
+        },
+        {
+            "id": "SSID",
+            "value": "WIFI_OFFICE_B2G"
+        },
+        {
+            "id": "signal",
+            "value": "100 %"
+        },
+        {
+            "id": "phy mode",
+            "value": "11n"
+        },
+        {
+            "id": "channel",
+            "value": "2"
+        },
+        {
+            "id": "ip mode",
+            "value": "dhcp"
+        },
+        {
+            "id": "ip",
+            "value": "192.168.1.43"
+        },
+        {
+            "id": "gw",
+            "value": "192.168.1.1"
+        },
+        {
+            "id": "msk",
+            "value": "255.255.255.0"
+        },
+        {
+            "id": "DNS",
+            "value": "192.168.1.1"
+        },
+        {
+            "id": "ap",
+            "value": "OFF"
+        },
+        {
+            "id": "mac",
+            "value": "30:AE:A4:21:BE:95"
+        },
+        {
+            "id": "serial",
+            "value": "ON"
+        },
+        {
+            "id": "notification",
+            "value": "OFF"
+        },
+        {
+            "id": "FW ver",
+            "value": "3.0.0.a28"
+        },
+        {
+            "id": "FW arch",
+            "value": "ESP32"
+        }
+    ]
+}

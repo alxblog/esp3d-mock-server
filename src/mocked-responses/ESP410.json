@@ -1,0 +1,33 @@
+{
+    "AP_LIST": [{
+            "SSID": "HP-Setup>71-M277 LaserJet",
+            "SIGNAL": "92",
+            "IS_PROTECTED": "0"
+        },
+        {
+            "SSID": "WIFI_OFFICE_B2G",
+            "SIGNAL": "88",
+            "IS_PROTECTED": "1"
+        },
+        {
+            "SSID": "NETGEAR70",
+            "SIGNAL": "66",
+            "IS_PROTECTED": "1"
+        },
+        {
+            "SSID": "ZenFone6&#39;luc",
+            "SIGNAL": "48",
+            "IS_PROTECTED": "1"
+        },
+        {
+            "SSID": "Livebox-EF01",
+            "SIGNAL": "20",
+            "IS_PROTECTED": "1"
+        },
+        {
+            "SSID": "orange",
+            "SIGNAL": "20",
+            "IS_PROTECTED": "0"
+        }
+    ]
+}
