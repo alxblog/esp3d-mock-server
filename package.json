@@ -1,15 +1,26 @@
 {
-  "name": "esp3d-mocking-server",
-  "version": "1.0.0",
+  "name": "esp3d-mock-server",
+  "version": "0.0.1",
+  "description": "Mock server (HTTP & WS) for ESP3D Web UI development.",
   "main": "src/index.js",
+  "bin": {
+    "esp3d-mock-server": "src/index.js"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
-  "author": "Alexandre <3979539+alxblog@users.noreply.github.com>",
+  "author": "Alxblog <3979539+alxblog@users.noreply.github.com>",
+  "homepage": "https://github.com/alxblog/esp3d-mocking-server",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alxblog/esp3d-mocking-server.git"
+  },
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.0",
     "cli-table": "^0.3.1",
+    "commander": "^6.2.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
@@ -19,7 +30,7 @@
     "rimraf": "^3.0.2",
     "ws": "^7.4.0"
   },
-  "devDependencies": {
-    "chalk": "^4.1.0"
+  "optionalDependencies": {
+    "nodemon": "^2.0.6"
   }
 }
