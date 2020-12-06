@@ -1,10 +1,10 @@
 # ESP3D Mock Server
 
-:computer: Mock server for ESP3D web UI development purpose.
+:computer:  Mock server for [ESP3D web UI](https://github.com/luc-github/ESP3D-WEBUI) development purpose.
 
-:warning: Do not use for production !
+:warning:  Do not use for production !  :warning:
 
-## Install
+## Installing
 
 ```
 yarn add esp3d-mock-server -D
@@ -12,7 +12,7 @@ yarn add esp3d-mock-server -D
 
 ## CLI options
 
-````
+```
 $ esp3d-mock-server
 
   -V, --version            output the version number
@@ -21,4 +21,4 @@ $ esp3d-mock-server
   -W, --ws-port <number>   Websocket server port (default: 81)
   -T, --throttle <number>  Throttle value (bps) (default: 0)
   -h, --help               display help for command
-````
+```
