@@ -1,11 +1,25 @@
+const Readline = require('@serialport/parser-readline')
 const { firmwareList } = require('../firmwareList.json')
 
 let ESP3D = class {
-    constructor(targetFW, webSocket) {
+    constructor(targetFW, webSocket, serialPort) {
         this.fwList = firmwareList
         this.targetFW = targetFW
         this.webSocket = webSocket
+        this.serialPort = serialPort
+
+        if (this.serialPort != null) {
+            const parser = this.serialPort.pipe(new Readline({ delimiter: '\n' }))
+            parser.on('data', (data) => {
+                // console.log(data)
+                this.sendWS(data)
+            })
+            this.serialPort.on('error', function (err) {
+                console.log('Error: ', err.message)
+            })
+        }
     }
+
     /**
      * Get a Firmware id by it name 
      * @param {number} fwId
@@ -22,7 +36,7 @@ let ESP3D = class {
      * Set Target Firmware
      * @param {number|string} fw 
      */
-    setFirmware(fw) {
+    setFirmware = (fw) => {
         this.targetFW = (!isNaN(fw)) ? this.getFWName(fw) : fw
         return this
     }
@@ -35,6 +49,12 @@ let ESP3D = class {
         console.log(`WS: Binary send `)
         this.webSocket.clients.forEach(client => {
             if (client.readyState == 1) client.send(response)
+        })
+    }
+
+    sendWS = (text) => {
+        this.webSocket.clients.forEach(client => {
+            if (client.readyState == 1) client.send(text)
         })
     }
 }

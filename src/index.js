@@ -2,11 +2,15 @@
 
 const { version } = require('../package.json')
 const { program } = require('commander')
+const inquirer = require('inquirer')
+const clear = require('console-clear')
+const jsonFwList = require('./firmwareList.json')
 const express = require("express")
 const WebSocket = require("ws")
 const cors = require('cors')
 const fileUpload = require("express-fileupload")
 const throttle = require('express-throttle-bandwidth')
+const SerialPort = require('serialport')
 const chalk = require('chalk')
 const { colorizedHTTPMethods } = require('./lib/dev')
 const Table = require('cli-table')
@@ -20,19 +24,112 @@ program
     .option('-F, --firmware <name>', 'Target firmware', "marlin")
     .option('-W, --ws-port <number>', 'Websocket server port', 81)
     .option('-T, --throttle <number>', 'Throttle value (bps)', 0)
-    .parse(process.argv)
+    .option('-S, --serial-port <path>', 'Serial path to bind', 0)
+    .option('-B, --serial-speed <number>', 'Serial communication speed', 250000)
+    .option('--prompt', 'Run CLI')
+    .parse(process.argv);
+
 
 /**
  * Ext Routes
  */
 var filesRoute = require('./routes/files')
 var commandRoute = require('./routes/command')
+const baudRateList = [9600, 14400, 19200, 38400, 57600, 115200, 128000, 250000, 256000, { name: chalk`{cyan custom}`, value: 'custom' }]
 
+const getDefaultIndex = (arr, value) => {
+    const index = arr.indexOf(value)
+    return (index != -1) ? index : false
+}
 
-const throttleValue = program.port || 0 //(bps) if bps is <= 0 it does not throttle.
-const port = program.port || 8080 //8888
-const wsPort = program.wsPort || 81//8830
-const targetFW = program.firmware || "marlin"
+let throttleValue = program.throttle //(bps) if bps is <= 0 it does not throttle.
+let port = program.port //8888
+let wsPort = program.wsPort //8830
+let targetFW = program.firmware
+let serialPort = program.serialPort
+let serialSpeed = program.serialSpeed
+
+if (program.prompt) {
+    const cli = async (program, firmwareList) => {
+        clear()
+        const availableSerialPorts = await SerialPort.list()
+        const answers = await inquirer
+            .prompt([
+                {
+                    type: 'confirm',
+                    name: 'useSerialBinding',
+                    message: 'Use serial binding',
+                    default: true,
+                },
+                {
+                    type: 'list',
+                    name: 'serialPort',
+                    message: 'Choose serial port',
+                    choices: availableSerialPorts.map(port => port.path),
+                    when: (answers) => answers.useSerialBinding
+                },
+                {
+                    type: 'list',
+                    name: 'speed',
+                    message: 'Set baudrate',
+                    choices: baudRateList,
+                    default: getDefaultIndex(baudRateList, program.serialSpeed) || 7,
+                    when: (answers) => answers.useSerialBinding
+                },
+                {
+                    type: 'number',
+                    name: 'customSpeed',
+                    message: 'Custom baudrate',
+                    when: (answers) => answers.speed === 'custom'
+                },
+                {
+                    type: 'list',
+                    name: 'firmware',
+                    message: 'Target firmware',
+                    choices: firmwareList.map(fw => fw.name),
+                    default: getDefaultIndex(firmwareList.map(fw => fw.name), program.firmware) || 'marlin',
+                },
+                {
+                    type: 'number',
+                    name: 'httpPort',
+                    message: 'HTTP Port',
+                    default: 8080
+                },
+                {
+                    type: 'number',
+                    name: 'wsPort',
+                    message: 'Websocket Port',
+                    default: 81
+                },
+                {
+                    type: 'number',
+                    name: 'throttle',
+                    message: 'Throttle (bps)',
+                    default: 0
+                },
+            ])
+        // .then((answers) => {
+        //     console.log(JSON.stringify(answers, null, '  '));
+        // run()
+        // });
+        return new Promise((resolve, reject) => {
+            // answers.catch(err => { if (err) reject(err) })
+            console.log(answers)
+            resolve(answers)
+        })
+
+    }
+    cli(program, jsonFwList.firmwareList).then(answers => {
+        throttleValue = answers.throttle
+        port = answers.httpPort
+        wsPort = answers.wsPort
+        targetFW = answers.firmware
+        serialPort = answers.serialPort
+        serialSpeed = answers.speed
+        run()
+    })
+}
+
 const fsDir = "public"
 let currentID = 0
 let sensorInterval = null
@@ -42,7 +139,13 @@ let feedrate = 100
 
 const app = express()
 const wss = new WebSocket.Server({ port: wsPort })
-const esp3d = new ESP3D(targetFW, wss)
+const esp3d = new ESP3D(
+    targetFW,
+    wss,
+    (serialPort)
+        ? new SerialPort(serialPort, { baudRate: parseInt(serialSpeed) })
+        : null
+)
 
 /**
  * MIDDLEWARES
@@ -99,5 +202,3 @@ const run = (async () => {
         ws.on("message", (message) => console.log("WS : received: %s", message))
     })
 })
-
-run()

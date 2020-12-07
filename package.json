@@ -1,6 +1,6 @@
 {
   "name": "esp3d-mock-server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Mock server (HTTP & WS) for ESP3D Web UI development.",
   "main": "src/index.js",
   "bin": {
@@ -21,13 +21,16 @@
     "chalk": "^4.1.0",
     "cli-table": "^0.3.1",
     "commander": "^6.2.0",
+    "console-clear": "^1.1.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-throttle-bandwidth": "^1.0.1",
+    "inquirer": "^7.3.3",
     "node-json-db": "^1.1.0",
     "recursive-copy": "^2.0.11",
     "rimraf": "^3.0.2",
+    "serialport": "^9.0.3",
     "ws": "^7.4.0"
   },
   "optionalDependencies": {

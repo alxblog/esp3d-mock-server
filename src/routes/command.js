@@ -22,62 +22,75 @@ const commandRoute = (esp3d) => {
         const { cmd } = req.query
         const [command, ...rest] = decodeURI(cmd).split(' ')
         const extratedCmd = extractGcodeCmd(command) || command  //extract command ex: M500 or raw command
-        switch (extratedCmd) {
-            case "$$": //GRBL Settings
-                if (targetFW == "grbl") esp3d.sendBinary(grbl)
+        // changer la priorité au commande ESP3D (ex: ESP100)
+        if (esp3d.serialPort != null) {
+            console.log('Dedans')
+            esp3d.serialPort.write(`${decodeURI(cmd)}\n`, function (err) {
+                if (err) console.log('Error on write: ', err.message)
+                // console.log('stdin : ', decodeURI(cmd))
                 res.send("ok")
-                break;
-            case "cat": //Smoothieware Settings
-                if (targetFW == "smoothieware") esp3d.sendBinary(smCat())
-                res.send("ok")
-                break;
-            case "ESP400": //Get full EEPROM settings content
-                res.json(esp400(esp3d.getFWId(targetFW)))
-                break;
-            case "ESP401": //Set EEPROM setting //TO-CHECK BY LUC
-                esp401(rest, esp3d)
-                res.send("ok ")
-                break;
-            case "ESP410": //Get available AP list (limited to 30)
-                res.send(esp410)
-                break;
-            case "ESP420": // Get current settings of ESP3D
-                res.json(esp420)
-                break;
-            case "ESP800": //Get FW Informations
-                res.json(esp800(targetFW))
-                break;
-            case "M20":
-                res.send(rest)
-                break;
-            case "M21":
-                if (["repetier", "repetier4davinci"].includes(targetFW))
-                    esp3d.sendBinary("ok\n");
-                res.send("")
-                break;
-            case "M105":
-                break;
-            case "M114":
-                esp3d.sendBinary(m114())
-                res.send("")
-                break;
-            case "M205":
-                if (targetFW == "repetier") esp3d.sendBinary(m205)
-                res.send("")
-                break;
-            case "M220":
-                break;
-            case "M408":
-                break;
-            case "M503":
-                esp3d.sendBinary(m503(targetFW))
-                res.send("")
-                break;
-            default:
-                res.json({ custom: "unknown query" })
-                // SendBinary("ok\n")
-                break;
+            })
         }
+        else
+            switch (extratedCmd) {
+                case "$$": //GRBL Settings
+                    if (targetFW == "grbl") esp3d.sendBinary(grbl)
+                    res.send("ok")
+                    break;
+                case "cat": //Smoothieware Settings
+                    if (targetFW == "smoothieware") esp3d.sendBinary(smCat())
+                    res.send("ok")
+                    break;
+                case "ESP400": //Get full EEPROM settings content
+                    res.json(esp400(esp3d.getFWId(targetFW)))
+                    break;
+                case "ESP401": //Set EEPROM setting //TO-CHECK BY LUC
+                    esp401(rest, esp3d)
+                    res.send("ok ")
+                    break;
+                case "ESP410": //Get available AP list (limited to 30)
+                    res.send(esp410)
+                    break;
+                case "ESP420": // Get current settings of ESP3D
+                    res.json(esp420)
+                    break;
+                case "ESP800": //Get FW Informations
+                    res.json(esp800(targetFW))
+                    break;
+                case "M20":
+                    res.send(rest)
+                    break;
+                case "M21":
+                    if (["repetier", "repetier4davinci"].includes(targetFW))
+                        esp3d.sendBinary("ok\n");
+                    res.send("")
+                    break;
+                case "M105":
+                    const g = () => (Math.random() * (100 - 0) + 0).toFixed(2)
+                    esp3d.sendBinary(`T:${g()} / ${g()} B:${g()} / ${g()}`);
+                    res.send("ok\n")
+                    break;
+                case "M114":
+                    esp3d.sendBinary(m114())
+                    res.send("")
+                    break;
+                case "M205":
+                    if (targetFW == "repetier") esp3d.sendBinary(m205)
+                    res.send("")
+                    break;
+                case "M220":
+                    break;
+                case "M408":
+                    break;
+                case "M503":
+                    esp3d.sendBinary(m503(targetFW))
+                    res.send("")
+                    break;
+                default:
+                    res.json({ custom: "unknown query" })
+                    // SendBinary("ok\n")
+                    break;
+            }
 
     })
     // HANDLE COMMANDS HERE
