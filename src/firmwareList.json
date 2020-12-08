@@ -4,6 +4,10 @@
             "name": "unknown"
         },
         {
+            "id": 1,
+            "name": "grbl"
+        },
+        {
             "id": 2,
             "name": "marlin"
         },
@@ -18,10 +22,6 @@
         {
             "id": 5,
             "name": "repetier"
-        },
-        {
-            "id": 6,
-            "name": "grbl"
         }
     ]
 }
