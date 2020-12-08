@@ -16,18 +16,17 @@ const {
     sendSensorData,
 } = require('../lib')
 
+const isStartsWith = (src, lookup) => (src.startsWith(lookup) != -1) ? true : false
+
 const commandRoute = (esp3d) => {
     const targetFW = esp3d.targetFW
     router.all("/", (req, res) => {
         const { cmd } = req.query
         const [command, ...rest] = decodeURI(cmd).split(' ')
         const extratedCmd = extractGcodeCmd(command) || command  //extract command ex: M500 or raw command
-        // changer la priorité au commande ESP3D (ex: ESP100)
-        if (esp3d.serialPort != null) {
-            console.log('Dedans')
+        if (esp3d.serialPort != null && !command.startsWith('ESP')) {
             esp3d.serialPort.write(`${decodeURI(cmd)}\n`, function (err) {
                 if (err) console.log('Error on write: ', err.message)
-                // console.log('stdin : ', decodeURI(cmd))
                 res.send("ok")
             })
         }
