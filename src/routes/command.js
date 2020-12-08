@@ -18,19 +18,54 @@ const {
 
 const isStartsWith = (src, lookup) => (src.startsWith(lookup) != -1) ? true : false
 
+const parseESPCmd = (cmd) => {
+    const [matches] = [...cmd.matchAll(/\[?(?:ESP)(?<espcmd>\d+)\]?/gmi)]
+    const { espcmd } = matches.groups
+    return (espcmd) ? espcmd : false
+    // console.log(match.espcmd)
+}
+
 const commandRoute = (esp3d) => {
     const targetFW = esp3d.targetFW
     router.all("/", (req, res) => {
         const { cmd } = req.query
         const [command, ...rest] = decodeURI(cmd).split(' ')
-        const extratedCmd = extractGcodeCmd(command) || command  //extract command ex: M500 or raw command
-        if (esp3d.serialPort != null && !command.startsWith('ESP')) {
+
+        if (command.startsWith('[ESP') || command.startsWith('ESP')) {
+            const espCode = parseESPCmd(command)
+            console.log('COMMANDE ESP', espCode)
+            switch (parseInt(espCode)) {
+                case 400: //Get full EEPROM settings content
+                    res.json(esp400(esp3d.getFWId(targetFW)))
+                    break;
+                case 401: //Set EEPROM setting //TO-CHECK BY LUC
+                    esp401(rest, esp3d)
+                    res.send("ok ")
+                    break;
+                case 410: //Get available AP list (limited to 30)
+                    res.send(esp410)
+                    break;
+                case 420: // Get current settings of ESP3D
+                    res.json(esp420)
+                    break;
+                case 800: //Get FW Informations
+                    res.json(esp800(targetFW))
+                    break;
+                default:
+                    res.json({ custom: "unknown ESP query" })
+                    esp3d.sendBinary(`echo:Unknown ESP command: "[ESP${command}]"\nok\n`)
+                    break;
+            }
+
+        }
+        else if (esp3d.serialPort != null && !command.startsWith('ESP')) {
             esp3d.serialPort.write(`${decodeURI(cmd)}\n`, function (err) {
                 if (err) console.log('Error on write: ', err.message)
                 res.send("ok")
             })
         }
-        else
+        else {
+            const extratedCmd = extractGcodeCmd(command) || command  //extract command ex: M500 or raw command
             switch (extratedCmd) {
                 case "$$": //GRBL Settings
                     if (targetFW == "grbl") esp3d.sendBinary(grbl)
@@ -39,22 +74,6 @@ const commandRoute = (esp3d) => {
                 case "cat": //Smoothieware Settings
                     if (targetFW == "smoothieware") esp3d.sendBinary(smCat())
                     res.send("ok")
-                    break;
-                case "ESP400": //Get full EEPROM settings content
-                    res.json(esp400(esp3d.getFWId(targetFW)))
-                    break;
-                case "ESP401": //Set EEPROM setting //TO-CHECK BY LUC
-                    esp401(rest, esp3d)
-                    res.send("ok ")
-                    break;
-                case "ESP410": //Get available AP list (limited to 30)
-                    res.send(esp410)
-                    break;
-                case "ESP420": // Get current settings of ESP3D
-                    res.json(esp420)
-                    break;
-                case "ESP800": //Get FW Informations
-                    res.json(esp800(targetFW))
                     break;
                 case "M20":
                     res.send(rest)
@@ -90,7 +109,7 @@ const commandRoute = (esp3d) => {
                     // SendBinary("ok\n")
                     break;
             }
-
+        }
     })
     // HANDLE COMMANDS HERE
     return router

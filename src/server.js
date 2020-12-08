@@ -14,6 +14,10 @@ const { sendSensorData, SendBinary, sendBinary } = require('./lib')
 
 
 /**
+ * @todo Check throttle
+ */
+
+/**
  * Ext Routes
  */
 var filesRoute = require('./routes/files')
@@ -50,7 +54,7 @@ const server = ({
      */
     app.use(cors())
     app.use(express.static(fsDir))
-    app.use(throttleBandwidth(throttle))
+    app.use(throttleBandwidth(parseIn(throttle)))
     app.use(fileUpload({ preserveExtension: true, debug: false }))
 
     app.use((req, res, next) => {
