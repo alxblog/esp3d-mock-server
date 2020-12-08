@@ -8,6 +8,7 @@ const chalk = require('chalk')
 const SerialPort = require('serialport')
 const pkg = require('../package.json');
 const { firmwareList } = require('./firmwareList.json')
+const server = require('./index')
 
 const baudRateList = [9600, 14400, 19200, 38400, 57600, 115200, 128000, 250000, 256000, { name: chalk`{cyan custom}`, value: 'custom' }]
 
@@ -117,4 +118,4 @@ const getAppParams = async () => {
 }
 
 const appParams = getAppParams()
-appParams.then(res => console.log('Finally', res))
+appParams.then(res => { server(res) })
