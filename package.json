@@ -1,6 +1,6 @@
 {
   "name": "esp3d-mock-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Mock server (HTTP & WS) for ESP3D Web UI development.",
   "main": "src/index.js",
   "bin": {
