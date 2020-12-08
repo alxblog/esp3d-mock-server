@@ -1,12 +1,7 @@
 {
-    "firmwareList": [
-        {
+    "firmwareList": [{
             "id": 0,
             "name": "unknown"
-        },
-        {
-            "id": 1,
-            "name": "repetier4davinci"
         },
         {
             "id": 2,
