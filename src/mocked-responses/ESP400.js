@@ -1,4 +1,4 @@
-module.exports = (targetFWnb) => ({
+module.exports = (targetFWnb) => JSON.stringify({
     "Settings": [
         {
             F: "network/network",

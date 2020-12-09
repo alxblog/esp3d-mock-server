@@ -1,4 +1,4 @@
-module.exports = (targetFW) => (
+module.exports = (targetFW) => JSON.stringify(
     {
         "FWVersion": "3.0.0.a28",
         "FWTarget": targetFW,

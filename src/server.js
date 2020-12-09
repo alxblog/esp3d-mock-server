@@ -54,7 +54,7 @@ const server = ({
      */
     app.use(cors())
     app.use(express.static(fsDir))
-    app.use(throttleBandwidth(parseIn(throttle)))
+    app.use(throttleBandwidth(parseInt(throttle)))
     app.use(fileUpload({ preserveExtension: true, debug: false }))
 
     app.use((req, res, next) => {

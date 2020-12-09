@@ -1,11 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const grbl = require('../mocked-responses/grbl')
-const esp800 = require('../mocked-responses/ESP800')
-const esp400 = require('../mocked-responses/ESP400')
-const esp401 = require('../mocked-responses/ESP401')
-const esp410 = require('../mocked-responses/ESP410.json')
-const esp420 = require('../mocked-responses/ESP420.json')
+const esp = require('../mocked-responses/ESP')
 const smCat = require('../mocked-responses/smoothieware')
 const m205 = require('../mocked-responses/M205.repetier')
 const m114 = require('../mocked-responses/M114')
@@ -16,7 +12,7 @@ const {
     sendSensorData,
 } = require('../lib')
 
-const isStartsWith = (src, lookup) => (src.startsWith(lookup) != -1) ? true : false
+const { isJson, isStartsWith } = require('../utils')
 
 const parseESPCmd = (cmd) => {
     const [matches] = [...cmd.matchAll(/\[?(?:ESP)(?<espcmd>\d+)\]?/gmi)]
@@ -31,33 +27,19 @@ const commandRoute = (esp3d) => {
         const { cmd } = req.query
         const [command, ...rest] = decodeURI(cmd).split(' ')
 
+        /**
+        * If is ESP3D command
+        */
         if (command.startsWith('[ESP') || command.startsWith('ESP')) {
             const espCode = parseESPCmd(command)
-            console.log('COMMANDE ESP', espCode)
-            switch (parseInt(espCode)) {
-                case 400: //Get full EEPROM settings content
-                    res.json(esp400(esp3d.getFWId(targetFW)))
-                    break;
-                case 401: //Set EEPROM setting //TO-CHECK BY LUC
-                    esp401(rest, esp3d)
-                    res.send("ok ")
-                    break;
-                case 410: //Get available AP list (limited to 30)
-                    res.send(esp410)
-                    break;
-                case 420: // Get current settings of ESP3D
-                    res.json(esp420)
-                    break;
-                case 800: //Get FW Informations
-                    res.json(esp800(targetFW))
-                    break;
-                default:
-                    res.json({ custom: "unknown ESP query" })
-                    esp3d.sendBinary(`echo:Unknown ESP command: "[ESP${command}]"\nok\n`)
-                    break;
-            }
-
+            // console.log('COMMANDE ESP', espCode)
+            const espResp = (espCode) ? esp(espCode, targetFW, esp3d, rest) : null
+            if (isJson(espResp)) { res.json(JSON.parse(espResp)) }
+            else { res.send(espResp) }
         }
+        /**
+         * If Serial Binding is enable
+         */
         else if (esp3d.serialPort != null && !command.startsWith('ESP')) {
             esp3d.serialPort.write(`${decodeURI(cmd)}\n`, function (err) {
                 if (err) console.log('Error on write: ', err.message)
@@ -137,11 +119,6 @@ M220%20S
 M220%20S
 M408
 M503
-ESP420
-ESP400
-ESP401
-ESP410
-ESP800
 SENSOR%20ON
 SENSOR%20OFF
 =%24%24
