@@ -30,7 +30,7 @@ const updateESP400 = async (position, value) => {
     const ESP400 = await getESP400File()
     const currentSetting = ESP400["Settings"].filter(setting => setting["P"] == position)
     const restSettings = ESP400["Settings"].filter(setting => setting["P"] != position)
-    const newSetting = { ...currentSetting[0], V: value }
+    const newSetting = { ...currentSetting[0], V: value } //new value updating
     newSettings = {
         "Settings": [
             ...restSettings,
@@ -58,7 +58,7 @@ module.exports = async (args, esp3d) => {
             return ({ ...curr, [key]: value })
         }, {})
     console.log({ P, T, V })
-    if (P === "461") updateESP400(P, esp3d.getFWName(V))
-    else updateESP400(P, V)
+    if (P === "461") await updateESP400(P, esp3d.getFWName(V))
+    else await updateESP400(P, V)
     return P
 }

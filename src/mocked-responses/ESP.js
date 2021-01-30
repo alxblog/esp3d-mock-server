@@ -1,4 +1,5 @@
 const esp400 = require('../mocked-responses/ESP400')
+// const esp400 = require('../../public/ESP400.json')
 const esp401 = require('../mocked-responses/ESP401')
 const esp410 = require('../mocked-responses/ESP410.json')
 const esp420 = require('../mocked-responses/ESP420.json')
@@ -8,7 +9,9 @@ module.exports = (cmd, targetFW, esp3d, params) => {
     const cmdInt = parseInt(cmd)
     var esp = {
         400: function () {
-            return esp400(esp3d.getFWId(targetFW))
+            //handle missing esp400 file
+            // return esp400(esp3d.getFWId(targetFW))
+            return esp400()
         },
         401: function () {
             esp401(params, esp3d)
